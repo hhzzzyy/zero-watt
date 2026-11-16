@@ -1,0 +1,6 @@
+[Desktop Entry]
+Name=Power Monitor
+Exec=bin/run-power-monitor
+Terminal=false
+Icon=share/images/power-monitor.png
+Type=Application

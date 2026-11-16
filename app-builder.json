@@ -1,0 +1,6 @@
+{
+  "app_name": "Power Monitor",
+  "package_name": "power-monitor",
+  "version": "0.1.0",
+  "description": "LVGL ASCII battery power monitor with a 60-second history for Cardputer Zero"
+}
