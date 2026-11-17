@@ -19,10 +19,10 @@
     ],
     "icon": "applaunch/share/images/zero-watt.png",
     "license": "MIT",
-    "source_repo": "https://github.com/hzy/zero-watt",
+    "source_repo": "https://github.com/hhzzzyy/zero-watt",
     "author": {
-      "github": "hzy",
-      "display_name": "hzy"
+      "github": "hhzzzyy",
+      "display_name": "hhzzzyy"
     },
     "share_code": "ZWAT",
     "permissions": {
