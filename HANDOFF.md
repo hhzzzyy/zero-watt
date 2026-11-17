@@ -7,7 +7,7 @@
 - 商店拒绝了 `usr/lib/systemd/user/zero-watt-collector.service`。单元改为模板 `usr/share/zero-watt/zero-watt-collector.service`；应用启动时复制到 `~/.config/systemd/user/`，执行 `systemctl --user daemon-reload` 后再启动。
 - 包内移除 postinst，不再安装任何 `usr/lib/systemd/user` 或系统级 service。
 - 官方 `install_path_policy.py` 对 `dist/ZeroWatt_0.1.0_rev1_arm64.deb` 返回 clean。
-- 设备当时未连接，运行时安装单元这一步尚未真机验证。
+- 真机验证：安装新包后 `/usr/lib/systemd/user` 已不存在；首次启动创建 `~/.config/systemd/user/zero-watt-collector.service`（0644，属主 hzy，与模板一致），daemon-reload 后采集服务 active；长按 Esc 退出后 collector inactive，启动器已恢复。
 
 ## 最新更新：更名为 Zero Watt
 

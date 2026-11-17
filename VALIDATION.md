@@ -146,6 +146,10 @@ installs a `postinst` or any file under `usr/lib/systemd/user`.
   files, no system services, and no `usr/local` or aliased `bin`/`lib` paths.
 - Desktop build and all five CTest checks pass; `cp0-cross-package` builds the
   arm64 DEB with the new layout.
-- Not yet verified on hardware: the runtime copy of the unit, `daemon-reload`,
-  and the successful `systemctl --user start` after an upgrade. The device was
-  disconnected while this change was built.
+- Verified on the Debian 13 device after installing the rebuilt package:
+  `usr/lib/systemd/user/` is gone; on first launch the app created
+  `~/.config/systemd/user/zero-watt-collector.service` (mode `0644`, owned by
+  the logged-in user, byte-identical to the template), reloaded the user manager,
+  and the collector became active (`--status` reported `active=1`). A 1.2-second
+  Esc hold exited the frontend and stopped the collector (`active=0`); the
+  launcher was restored afterwards.

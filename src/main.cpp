@@ -196,19 +196,26 @@ namespace {
     const auto target=directory/"zero-watt-collector.service";
     std::ifstream old(target);
     const std::string previous((std::istreambuf_iterator<char>(old)),std::istreambuf_iterator<char>());
-    if(previous==unit) return;
+    const bool changed=previous!=unit;
     std::error_code ec;
-    std::filesystem::create_directories(directory,ec);
-    if(ec) throw std::runtime_error("Cannot create "+directory.string()+": "+ec.message());
-    const auto temporary=target.string()+".tmp";
-    {
-      std::ofstream out(temporary,std::ios::binary|std::ios::trunc);
-      out<<unit;
-      if(!out) throw std::runtime_error("Cannot write "+temporary);
+    if(changed) {
+      std::filesystem::create_directories(directory,ec);
+      if(ec) throw std::runtime_error("Cannot create "+directory.string()+": "+ec.message());
+      const auto temporary=target.string()+".tmp";
+      {
+	std::ofstream out(temporary,std::ios::binary|std::ios::trunc);
+	out<<unit;
+	if(!out) throw std::runtime_error("Cannot write "+temporary);
+      }
+      std::filesystem::rename(temporary,target,ec);
+      if(ec) throw std::runtime_error("Cannot install "+target.string()+": "+ec.message());
     }
-    std::filesystem::rename(temporary,target,ec);
-    if(ec) throw std::runtime_error("Cannot install "+target.string()+": "+ec.message());
-    if(std::system("systemctl --user daemon-reload")!=0) throw std::runtime_error("Cannot reload user systemd units");
+    std::filesystem::permissions(target,
+      std::filesystem::perms::owner_read|std::filesystem::perms::owner_write|
+      std::filesystem::perms::group_read|std::filesystem::perms::others_read,
+      std::filesystem::perm_options::replace,ec);
+    if(ec) throw std::runtime_error("Cannot set permissions on "+target.string()+": "+ec.message());
+    if(changed && std::system("systemctl --user daemon-reload")!=0) throw std::runtime_error("Cannot reload user systemd units");
   }
   std::string framebuffer() {
     if(auto *env=std::getenv("LV_LINUX_FBDEV_DEVICE")) if(*env) return env;

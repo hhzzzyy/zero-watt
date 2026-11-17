@@ -65,6 +65,7 @@ read, using demo data where the UI is marked `[DEMO]`.
 - [x] APPLaunch `.desktop`, executable, PNG icon, and collector unit template exist inside the package.
 - [x] No forbidden install paths (`usr/local`, aliased `bin/`/`lib/` roots, `usr/lib/systemd/user`); everything is under `usr/bin`, `usr/share/zero-watt`, `usr/share/APPLaunch`, or `usr/share/doc`.
 - [x] Official `install_path_policy.py` reports no rejected paths for the built `.deb`.
+- [x] Runtime user-unit installation verified on the device: the unit is created under `~/.config/systemd/user/` with mode `0644`, `daemon-reload` runs, and the collector starts and stops with the app.
 - [x] The renamed package was installed on the device with `dpkg -i`; it replaced
       the `power-monitor` development package and the old collector was stopped.
 - [x] `cmake -DPACKAGE_FILE=dist/ZeroWatt_0.1.0_rev1_arm64.deb -P .agents/skills/cardputerzero-package-release/scripts/validate_app_builder.cmake` passes.
