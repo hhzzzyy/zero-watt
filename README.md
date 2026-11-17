@@ -1,6 +1,6 @@
 # Zero Watt v0.1.0
 
-Zero Watt 是 Cardputer Zero 的电池功率监视器。LVGL 9.5 在 320×170 屏幕上绘制 **40 列 × 18 行等宽字符界面**，使用内置 UNSCII 8 等宽字体，每行 9 像素。功率历史使用绿色连续折线，其余界面保留字符风格，没有传统按钮。APPLaunch 的 `Terminal=false`：这是字符风格的图形程序。
+Zero Watt 是 Cardputer Zero 的电池功率监视器。它每秒读取 BQ27220 的电压、电流、电量、温度和状态，显示电池端充/放电功率、净平均值、最近 60 秒的实时曲线，以及可平移缩放的历史页。界面用 LVGL 9.5 绘制在 320×170 屏幕上，等宽字符排版，没有按钮，用 B / T / G / H / Esc 操作。APPLaunch 的 `Terminal=false`：这是图形程序。
 
 ![LVGL demo capture](preview/demo.png)
 
@@ -15,7 +15,7 @@ Zero Watt 是 Cardputer Zero 的电池功率监视器。LVGL 9.5 在 320×170 �
 | `voltage_now` | µV → V |
 | `current_now` | µA → mA，保留正负方向 |
 | `capacity` | 0–100% |
-| `temp` | 0.1°C → °C，ASCII 使用 C |
+| `temp` | 0.1°C → °C，度数符号显示为 `C` |
 | `time_to_empty_now` | 秒 → 时分，仅放电时显示 |
 | `status` | 充电、放电等原始状态 |
 
