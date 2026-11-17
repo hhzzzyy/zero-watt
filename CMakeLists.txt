@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.31)
-project(power-monitor VERSION 0.1.0 LANGUAGES C CXX)
+project(zero-watt VERSION 0.1.0 LANGUAGES C CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -74,9 +74,9 @@ if(BUILD_GUI)
     target_link_libraries(lvgl PUBLIC SDL2::SDL2)
   endif()
 
-  add_executable(power-monitor src/main.cpp)
-  target_link_libraries(power-monitor PRIVATE power_core lvgl)
-  target_compile_options(power-monitor PRIVATE -Wall -Wextra -Wpedantic)
+  add_executable(zero-watt src/main.cpp)
+  target_link_libraries(zero-watt PRIVATE power_core lvgl)
+  target_compile_options(zero-watt PRIVATE -Wall -Wextra -Wpedantic)
 
   if(BUILD_TESTING AND USE_DESKTOP)
     add_executable(power-interaction-tests tests/interaction_test.cpp)
@@ -90,7 +90,7 @@ if(BUILD_GUI)
     set_tests_properties(escape-lifecycle window-close-lifecycle PROPERTIES ENVIRONMENT "SDL_VIDEODRIVER=dummy" TIMEOUT 8)
   endif()
 
-  if(TARGET power-monitor)
+  if(TARGET zero-watt)
     include(cmake/cm0-package.cmake)
   endif()
 endif()

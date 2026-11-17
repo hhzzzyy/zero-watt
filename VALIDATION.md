@@ -1,12 +1,16 @@
 # v0.1 validation
 
+The project was renamed from Power Monitor (`power-monitor`) to Zero Watt
+(`zero-watt`) on 2026-11-17. Dated sections below keep the paths and package
+names that were current when the checks ran.
+
 Validated locally on macOS with AppleClang 21 and LVGL v9.5.0.
 
 - Core test: real temporary sysfs files, supplied 3.722 V / -384 mA = 1.429248 W, capacity/temperature/ETA units, charging ETA suppression, real zero, missing values, malformed numbers, overflow, invalid capacity, ETA sentinels, rolling eviction, missed seconds, same-second updates, stale expiration, Esc threshold/release/tick rollover, fixed-width printable ASCII frames.
 - SDL lifecycle: a quick Esc press does not exit; physical Esc hold exits without repeat; SDL quit exits without double-free after LVGL teardown. SDL dummy video backend runs these without opening a desktop window.
 - Actual LVGL renders checked at 320×170: demo history, supplied battery snapshot, missing sensor, help. PNGs are conversions of application's PPM captures, not a mockup or browser reimplementation.
 - Device input now reads evdev key events directly for B/T/G, digits, Backspace, arrows, Enter, and Esc. SDL physical key events feed the same commands. The standard LVGL translator omits alphabetic and numeric input.
-- Launcher metadata uses an absolute `/usr/bin/power-monitor` executable and the APPLaunch-relative icon `share/images/power-monitor.png`; `Terminal=false`; the icon is a 256×256 RGB PNG.
+- Launcher metadata uses an absolute `/usr/bin/zero-watt` executable and the APPLaunch-relative icon `share/images/zero-watt.png`; `Terminal=false`; the icon is a 256×256 RGB PNG.
 
 Historical note: Linux AArch64 linkage, real framebuffer, and packaging were later validated in the dated sections below; the final official package is recorded at the end. Physical keyboard, full launcher navigation, and power overhead remain unvalidated.
 
@@ -92,3 +96,24 @@ Not validated: physical key presses, full launcher navigation/selection, Home ha
 24-hour soak, actual suspend/resume, and power overhead. The store source repository,
 author GitHub identity, and `share_code` in `app-builder.json` are provisional and must be
 confirmed before an upload.
+
+## Rename to Zero Watt — 2026-11-17
+
+- Renamed the project from Power Monitor (`power-monitor`) to Zero Watt (`zero-watt`)
+  before the first store upload: Debian package, binary, APPLaunch entry, icon, user
+  collector unit, runtime directory, settings path, input-device environment variable,
+  shared-memory format version, and store metadata.
+- Reconfigured and rebuilt the desktop preset; all five CTest checks passed.
+- `cmake --workflow --preset cp0-cross-package` regenerated
+  `dist/ZeroWatt_0.1.0_rev1_arm64.deb`. `dpkg-deb` reports Package `zero-watt`,
+  Version `0.1.0-rev1`, Architecture `arm64`, and `Replaces`/`Conflicts: power-monitor`.
+  The package contains the ARM aarch64 `/usr/bin/zero-watt`, the `Zero Watt` APPLaunch
+  entry, `zero-watt.png`, the user collector unit, and docs under `/usr/share/doc/zero-watt`.
+  The official validator passes with the package path.
+- Regenerated the desktop captures with the new header: `preview/demo.png`,
+  `preview/help.png`, `preview/sample.png`, and `preview/missing.png`. The full-screen
+  history header shows time rather than the application name, so `preview/history.png`
+  is unchanged.
+- Not refreshed: `preview/device-*.png` still show the old `POWER MONITOR` header. They
+  need a new device capture session before store upload, and the device still has the
+  previous development package installed.

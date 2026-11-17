@@ -19,7 +19,7 @@ namespace power {
   namespace {
     constexpr int capacity=86400;
     struct Shared { uint32_t magic; int stop; int64_t heartbeat; Settings settings; double volts,amps,watts,battery,temp; int64_t eta; char status[32]; Record records[capacity]; };
-    constexpr uint32_t magic=0x504d0003;
+    constexpr uint32_t magic=0x5a570003;
     volatile sig_atomic_t collecting=1;
     void stop_signal(int) { collecting=0; }
     struct Lock { int fd; explicit Lock(int f):fd(f) { if(flock(fd,LOCK_EX)) throw std::runtime_error("Cannot lock collector storage"); } ~Lock(){flock(fd,LOCK_UN);} };
@@ -29,13 +29,13 @@ namespace power {
   int64_t monotonic_second(){return std::chrono::duration_cast<std::chrono::seconds>(std::chrono::steady_clock::now().time_since_epoch()).count();}
   Collector::Collector() {
     const char *runtime=getenv("XDG_RUNTIME_DIR");
-    directory_=runtime?std::string(runtime)+"/power-monitor":"/tmp/power-monitor-"+std::to_string(getuid());
+    directory_=runtime?std::string(runtime)+"/zero-watt":"/tmp/zero-watt-"+std::to_string(getuid());
     mkdir(directory_.c_str(),0700);
     struct stat st{};
     if(lstat(directory_.c_str(),&st) || !S_ISDIR(st.st_mode) || st.st_uid!=getuid() || (st.st_mode&0077)) throw std::runtime_error("Unsafe collector runtime directory");
     const char *home=getenv("HOME"),*config=getenv("XDG_CONFIG_HOME");
     config_=config?config:(home?std::string(home)+"/.config":directory_);
-    config_+="/power-monitor/settings";
+    config_+="/zero-watt/settings";
     fd_=open((directory_+"/state").c_str(),O_RDWR|O_CREAT|O_NOFOLLOW,0600);
     if(fd_<0) throw std::runtime_error("Cannot open collector storage");
     Lock lock(fd_);

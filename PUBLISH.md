@@ -9,25 +9,35 @@ Portal: <https://dev.cardputer.cc/#/upload>
 
 ## Package
 
-- Debian package: `dist/PowerMonitor_0.1.0_rev1_arm64.deb`
-- Package name: `power-monitor`
+- Debian package: `dist/ZeroWatt_0.1.0_rev1_arm64.deb`
+- Package name: `zero-watt`
 - Version: `0.1.0`, revision `rev1`
 - Architecture: `arm64`
 - Maintainer: `hzy <573493999@qq.com>`
-- APPLaunch desktop: `/usr/share/APPLaunch/applications/power-monitor.desktop`
-- Executable: `/usr/bin/power-monitor`
-- User collector unit: `/usr/lib/systemd/user/power-monitor-collector.service`
+- APPLaunch desktop: `/usr/share/APPLaunch/applications/zero-watt.desktop`
+- Executable: `/usr/bin/zero-watt`
+- User collector unit: `/usr/lib/systemd/user/zero-watt-collector.service`
+- Development upgrade: the package declares `Replaces`/`Conflicts: power-monitor`,
+  so `dpkg -i` replaces a previous Power Monitor development install.
+
+## Rename History
+
+2026-11-17: renamed from Power Monitor (`power-monitor`) to Zero Watt (`zero-watt`)
+before the first store upload. Store identity, binary, desktop entry, service,
+icon, settings directory, and environment variable changed; the provisional
+share code moved from `PWRM` to `ZWAT`. Nothing had been published, so there was
+no existing store identity to migrate.
 
 ## Source and Ownership
 
-- Public source repository: **TODO** — planned as `https://github.com/hzy/cardputer-power-monitor`; that URL currently returns 404, so create/push the repository before upload.
+- Public source repository: **TODO** — planned as `https://github.com/hzy/zero-watt`; that URL currently returns 404, so create/push the repository before upload.
 - Expected GitHub uploader/owner: `hzy` (confirm this is the actual GitHub identity)
 - License: MIT
-- Store share code: `PWRM` (provisional; confirm it is still unique in the store before first upload)
+- Store share code: `ZWAT` (provisional; confirm it is still unique in the store before first upload)
 
 ## Listing
 
-- Application name: Power Monitor
+- Application name: Zero Watt
 - One-line summary (maximum 80 characters): ASCII battery power monitor with a 60-second history for Cardputer Zero
 - Description: LVGL character interface displaying battery power, current, voltage, capacity, temperature and discharge ETA from the BQ27220 sysfs, with a 60-second live graph and full-screen history.
 - Categories (maximum 2 from the store enum): System Tools, Hardware & IoT
@@ -35,12 +45,16 @@ Portal: <https://dev.cardputer.cc/#/upload>
 
 ## Assets
 
-- 256 x 256 source icon: `applaunch/share/images/power-monitor.png`
-- Packaged icon: `/usr/share/APPLaunch/share/images/power-monitor.png`
+- 256 x 256 source icon: `applaunch/share/images/zero-watt.png`
+- Packaged icon: `/usr/share/APPLaunch/share/images/zero-watt.png`
 - Screenshot 1 (320 x 170): `preview/device-compact-home.png`
 - Screenshot 2 (320 x 170): `preview/device-h-help.png`
 - Screenshot 3 (320 x 170): `preview/device-history.png`
 - Screenshot 4 (320 x 170): `preview/device-settings.png`
+
+The four store screenshots predate the rename and still show the `POWER MONITOR`
+header. Replace them with fresh device captures (or the current 320 x 170
+captures) before uploading.
 
 ## Preflight
 
@@ -49,10 +63,11 @@ Portal: <https://dev.cardputer.cc/#/upload>
 - [x] Control fields contain Package, Version, Architecture, Maintainer, and Depends.
 - [x] Architecture is `arm64`.
 - [x] APPLaunch `.desktop`, executable, PNG icon, and user collector unit exist inside the package.
-- [x] `cmake -DPACKAGE_FILE=dist/PowerMonitor_0.1.0_rev1_arm64.deb -P .agents/skills/cardputerzero-package-release/scripts/validate_app_builder.cmake` passes.
+- [x] `cmake -DPACKAGE_FILE=dist/ZeroWatt_0.1.0_rev1_arm64.deb -P .agents/skills/cardputerzero-package-release/scripts/validate_app_builder.cmake` passes.
 - [ ] `app-builder.json` source repo exists publicly, author identity is confirmed, and `share_code` uniqueness is confirmed.
 - [ ] Listing copy and categories have been reviewed.
-- [ ] Four clean 320 x 170 baseline screenshots describe the current UI.
+- [ ] Four clean 320 x 170 baseline screenshots describe the current UI (current
+      device captures still show the old `POWER MONITOR` header).
 - [x] No credentials, tokens, or private server details are embedded.
 - [ ] The user explicitly approved external submission.
 

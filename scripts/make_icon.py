@@ -21,5 +21,5 @@ for col,height in enumerate([2,3,5,7,4,2,3,6,5,3]):
 def chunk(kind,data):
     return struct.pack('>I',len(data))+kind+data+struct.pack('>I',zlib.crc32(kind+data)&0xffffffff)
 raw=b''.join(b'\0'+pixels[y*size*3:(y+1)*size*3] for y in range(size))
-output=Path(__file__).resolve().parents[1]/'applaunch/share/images/power-monitor.png'
+output=Path(__file__).resolve().parents[1]/'applaunch/share/images/zero-watt.png'
 output.write_bytes(b'\x89PNG\r\n\x1a\n'+chunk(b'IHDR',struct.pack('>IIBBBBB',size,size,8,2,0,0,0))+chunk(b'IDAT',zlib.compress(raw))+chunk(b'IEND',b''))

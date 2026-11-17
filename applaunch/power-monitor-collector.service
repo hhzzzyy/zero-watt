@@ -1,9 +1,0 @@
-[Unit]
-Description=Power Monitor battery collector
-
-[Service]
-Type=simple
-ExecStart=/usr/bin/power-monitor --collect
-Restart=on-failure
-RestartSec=2
-UMask=0077

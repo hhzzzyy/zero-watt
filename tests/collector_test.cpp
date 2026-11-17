@@ -33,7 +33,7 @@ int main(){
          c.request_stop();}
         int status;waitpid(child,&status,0);child=-1;check(WIFEXITED(status)&&WEXITSTATUS(status)==0,"clean stop");
         {power::Collector c;check(!c.active(),"stopped");}
-        std::filesystem::remove(std::string(path)+"/power-monitor/state");
+        std::filesystem::remove(std::string(path)+"/zero-watt/state");
         {power::Collector c;check(!c.settings().background && c.settings().minutes==2,"settings persist without runtime");}
         std::filesystem::remove_all(path);return 0;
     }catch(const std::exception &e){std::cerr<<e.what()<<'\n';if(child>0){kill(child,SIGTERM);waitpid(child,nullptr,0);}std::filesystem::remove_all(path);return 1;}

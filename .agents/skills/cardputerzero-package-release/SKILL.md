@@ -1,6 +1,6 @@
 ---
 name: cardputerzero-package-release
-description: Configure, build, verify, package, deploy, or prepare upload metadata for the Power Monitor application. Use for CMake presets, aarch64 Debian artifacts, app-builder.json matching, and release diagnostics; do not use for ordinary source edits.
+description: Configure, build, verify, package, deploy, or prepare upload metadata for the Zero Watt application. Use for CMake presets, aarch64 Debian artifacts, app-builder.json matching, and release diagnostics; do not use for ordinary source edits.
 ---
 
 # CardputerZero Package Release

@@ -1,0 +1,9 @@
+[Unit]
+Description=Zero Watt battery collector
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/zero-watt --collect
+Restart=on-failure
+RestartSec=2
+UMask=0077

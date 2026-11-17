@@ -1,8 +1,8 @@
 {
-  "app_name": "Power Monitor",
-  "package_name": "power-monitor",
+  "app_name": "Zero Watt",
+  "package_name": "zero-watt",
   "version": "0.1.0",
-  "bin_name": "power-monitor",
+  "bin_name": "zero-watt",
   "description": "ASCII battery power monitor for Cardputer Zero",
   "store": {
     "summary": "ASCII battery power monitor with a 60-second history for Cardputer Zero",
@@ -17,14 +17,14 @@
       "preview/device-history.png",
       "preview/device-settings.png"
     ],
-    "icon": "applaunch/share/images/power-monitor.png",
+    "icon": "applaunch/share/images/zero-watt.png",
     "license": "MIT",
-    "source_repo": "https://github.com/hzy/cardputer-power-monitor",
+    "source_repo": "https://github.com/hzy/zero-watt",
     "author": {
       "github": "hzy",
       "display_name": "hzy"
     },
-    "share_code": "PWRM",
+    "share_code": "ZWAT",
     "permissions": {
       "camera": false,
       "microphone": false,

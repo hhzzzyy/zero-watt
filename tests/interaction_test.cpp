@@ -1,4 +1,4 @@
-#define main power_monitor_main
+#define main zero_watt_main
 #include "../src/main.cpp"
 #undef main
 #include <cassert>

@@ -25,7 +25,7 @@ namespace power {
   }
   Frame render(const Sample &s,const History &h,int64_t now,bool demo,bool help) {
     Frame f{};
-    f[0]=demo?" POWER MONITOR 0.1            [DEMO]":" POWER MONITOR 0.1            [LIVE]";
+    f[0]=demo?" ZERO WATT 0.1                [DEMO]":" ZERO WATT 0.1                [LIVE]";
     if(help) {
       f[2]=" KEYS";
       f[4]=" B        Background sampling";

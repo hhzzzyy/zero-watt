@@ -1,4 +1,4 @@
-#define main power_monitor_main
+#define main zero_watt_main
 #include "../src/main.cpp"
 #undef main
 #include <SDL.h>
@@ -20,9 +20,9 @@ int main(int argc,char **) {
         std::this_thread::sleep_for(std::chrono::milliseconds(1300));
         if(!done) { SDL_Event event{}; event.type=SDL_QUIT; SDL_PushEvent(&event); }
     });
-    char name[]="power-monitor", demo[]="--demo"; char *args[]={name,demo};
+    char name[]="zero-watt", demo[]="--demo"; char *args[]={name,demo};
     auto begin=Clock::now();
-    int result=power_monitor_main(2,args); done=true;
+    int result=zero_watt_main(2,args); done=true;
     auto elapsed=std::chrono::duration_cast<std::chrono::milliseconds>(Clock::now()-begin).count();
     events.join();
     if(result || early || (argc==1 && (elapsed<1300 || elapsed>1700))) return 1;

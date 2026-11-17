@@ -198,7 +198,7 @@ int main(int argc,char **argv) {
       else if(arg=="--sysfs-root" && i+1<argc) root=argv[++i];
       else if(arg=="--capture" && i+1<argc) capture=argv[++i];
       else if(arg=="--help-screen") help=true;
-      else if(arg=="--help") { std::cout<<"power-monitor [--demo] [--sysfs-root DIR] [--capture FILE.ppm] [--help-screen] [--history-screen] [--collect]\n"; return 0; }
+      else if(arg=="--help") { std::cout<<"zero-watt [--demo] [--sysfs-root DIR] [--capture FILE.ppm] [--help-screen] [--history-screen] [--collect]\n"; return 0; }
       else throw std::runtime_error("Unknown or incomplete option: "+arg);
     }
     if(status_only){power::Collector c;auto s=c.snapshot();auto settings=c.settings();
@@ -218,7 +218,7 @@ int main(int argc,char **argv) {
 	  execl(argv[0],argv[0],"--collect","--sysfs-root",root.c_str(),nullptr);_exit(1);}
 	int status=0;waitpid(child,&status,0);
 #else
-	if(std::system("systemctl --user start power-monitor-collector.service")!=0)throw std::runtime_error("Cannot start collector user service");
+	if(std::system("systemctl --user start zero-watt-collector.service")!=0)throw std::runtime_error("Cannot start collector user service");
 #endif
 	for(int i=0;i<30 && !collector->active();++i)std::this_thread::sleep_for(std::chrono::milliseconds(100));
 	if(!collector->active())throw std::runtime_error("Collector did not start");
@@ -245,7 +245,7 @@ int main(int argc,char **argv) {
     } else {
 #if USE_DESKTOP
       display=lv_sdl_window_create(320,170);
-      lv_sdl_window_set_title(display,"Power Monitor");
+      lv_sdl_window_set_title(display,"Zero Watt");
       keyboard=lv_sdl_keyboard_create();
 #else
       const auto fb=framebuffer();
@@ -257,7 +257,7 @@ int main(int argc,char **argv) {
 	throw std::runtime_error("Expected a 320x170 framebuffer: "+fb);
       display=lv_linux_fbdev_create();
       lv_linux_fbdev_set_file(display,fb.c_str());
-      const char *key=std::getenv("POWER_MONITOR_INPUT_DEVICE");
+      const char *key=std::getenv("ZERO_WATT_INPUT_DEVICE");
       if(!key || !*key) key="/dev/input/by-path/platform-3f804000.i2c-event";
       input_fd=open(key,O_RDONLY|O_NONBLOCK|O_CLOEXEC);
       if(input_fd<0)throw std::runtime_error("Cannot open keyboard input device");
@@ -468,5 +468,5 @@ int main(int argc,char **argv) {
       lv_deinit();
     }
     return 0;
-  } catch(const std::exception &e) { std::cerr<<"Power Monitor: "<<e.what()<<'\n'; return 1; }
+  } catch(const std::exception &e) { std::cerr<<"Zero Watt: "<<e.what()<<'\n'; return 1; }
 }

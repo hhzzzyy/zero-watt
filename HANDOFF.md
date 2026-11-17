@@ -1,6 +1,14 @@
-# Power Monitor 交接记录
+# Zero Watt 交接记录
 
 更新：2026-11-17（Asia/Shanghai）
+
+## 最新更新：更名为 Zero Watt
+
+- 显示名 `Zero Watt`，包名与二进制 `zero-watt`；源码目录仍是 `cardputer-power-monitor`，没有改目录名。
+- 同步改名：`/usr/bin/zero-watt`、`zero-watt-collector.service`、`zero-watt.desktop`、`zero-watt.png`、运行时目录 `$XDG_RUNTIME_DIR/zero-watt`、设置 `~/.config/zero-watt/settings`、环境变量 `ZERO_WATT_INPUT_DEVICE`，共享内存格式版本改为 `0x5a570003`。
+- 商店字段：`app_name=Zero Watt`、`package_name=zero-watt`、`share_code=ZWAT`（仍待商店确认唯一）。
+- 重新构建：桌面五项测试通过；`cp0-cross-package` 生成 `dist/ZeroWatt_0.1.0_rev1_arm64.deb`，validator 通过。DEB 声明 `Replaces`/`Conflicts: power-monitor`，设备上可直接替换旧开发包。
+- 桌面截图 demo/help/sample/missing 已按新标题重渲；`preview/device-*.png` 仍是旧标题，设备重新连接后需要重拍。
 
 ## 最新更新：完全对齐官方 Template 构建/发布标准
 
@@ -66,15 +74,11 @@
 
 ## Git 状态
 
-分支 `main`，基线提交 `06c3c20 Initial Power Monitor v0.1 source`。
-最新折线改动尚未提交。不要 reset/覆盖：
+分支 `main`。提交：
 
-- `src/main.cpp`：GraphState、自定义 LVGL 绘制回调、帮助页隐藏曲线。
-- `src/ascii_view.cpp/.hpp`：删除字符柱形，增加共享上限计算及帮助文案。
-- `README.md`、`VALIDATION.md`：同步曲线、设备验证和用户级服务说明。
-- `preview/{demo,help,missing,sample}.png` 已刷新。
-- 新增 `preview/device-curve-demo.png`、`preview/device-curve-help.png`：真机 framebuffer 截图，标有 DEMO。
-- 本 HANDOFF.md 为新文件。
+- `06c3c20 Initial Power Monitor v0.1 source`（基线，保留当时的工程名）
+- `0aa885a feat: background collector, history page, and official packaging`
+- 本次改名提交：`refactor: rename project to Zero Watt`
 
 没有设置远端或推送；不要自动推断商店发布许可。
 
@@ -87,8 +91,8 @@ cd /Users/hzy/Programming/cardputer-power-monitor
 cmake --preset darwin-arm64
 cmake --build --preset darwin-arm64-rel
 ctest --test-dir build/darwin-arm64 -C Release --output-on-failure
-./build/darwin-arm64/Release/power-monitor --demo
-./build/darwin-arm64/Release/power-monitor --demo --capture /tmp/power-demo.ppm
+./build/darwin-arm64/Release/zero-watt --demo
+./build/darwin-arm64/Release/zero-watt --demo --capture /tmp/zero-watt-demo.ppm
 
 # 官方交叉构建/打包（需要 PATH 中有 aarch64-linux-gnu-gcc/g++）
 export PATH=/tmp/cross-toolchain/aarch64-unknown-linux-gnu/bin:$PATH
@@ -105,20 +109,20 @@ ADB shell 是 root。先前在沙箱内启动的 ADB 服务无法识别 USB，�
 
 设备：Debian GNU/Linux 13 (trixie)，aarch64，约 352 MiB RAM + swap。使用 `-j1` 编译。
 
-- 程序：`/usr/bin/power-monitor`
-- 用户级采集服务：`/usr/lib/systemd/user/power-monitor-collector.service`
-- desktop：`/usr/share/APPLaunch/applications/power-monitor.desktop`
-- 图标：`/usr/share/APPLaunch/share/images/power-monitor.png`
-- 文档：`/usr/share/doc/power-monitor/`
+- 程序：`/usr/bin/zero-watt`
+- 用户级采集服务：`/usr/lib/systemd/user/zero-watt-collector.service`
+- desktop：`/usr/share/APPLaunch/applications/zero-watt.desktop`
+- 图标：`/usr/share/APPLaunch/share/images/zero-watt.png`
+- 文档：`/usr/share/doc/zero-watt/`
 
-旧的手动安装文件（`/usr/share/APPLaunch/bin/power-monitor`、`run-power-monitor` wrapper）不会被官方包删除；启动器已改为指向 `/usr/bin/power-monitor`。设备不再需要本地源码或 `build-device`。
+设备上目前仍安装着旧的 `power-monitor` 开发包；新的 DEB 声明 `Replaces`/`Conflicts: power-monitor`，`dpkg -i` 会替换它。旧的手动安装文件（`/usr/share/APPLaunch/bin/power-monitor`、`run-power-monitor` wrapper）不会被官方包删除；启动器已改为指向 `/usr/bin/zero-watt`。设备不再需要本地源码或 `build-device`。
 
 官方包在 Mac 上构建，设备上直接安装：
 
 ```sh
 ADB=/tmp/cardputer-adb/platform-tools/adb
-"$ADB" -s CardputerZero-c7f0bb67 push dist/PowerMonitor_0.1.0_rev1_arm64.deb /data/local/tmp/
-"$ADB" -s CardputerZero-c7f0bb67 shell dpkg -i /data/local/tmp/PowerMonitor_0.1.0_rev1_arm64.deb
+"$ADB" -s CardputerZero-c7f0bb67 push dist/ZeroWatt_0.1.0_rev1_arm64.deb /data/local/tmp/
+"$ADB" -s CardputerZero-c7f0bb67 shell dpkg -i /data/local/tmp/ZeroWatt_0.1.0_rev1_arm64.deb
 # postinst 已对活动用户执行 daemon-reload；需要时手动再执行
 "$ADB" -s CardputerZero-c7f0bb67 shell 'runuser -u hzy -- env XDG_RUNTIME_DIR=/run/user/1000 systemctl --user daemon-reload'
 "$ADB" -s CardputerZero-c7f0bb67 shell 'runuser -u hzy -- env XDG_RUNTIME_DIR=/run/user/1000 systemctl --user restart APPLaunch.service'
