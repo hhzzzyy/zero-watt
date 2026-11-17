@@ -8,8 +8,7 @@
     "summary": "Battery power monitor for Cardputer Zero with a live watt curve and history",
     "description": "Reads BQ27220 voltage, current, capacity and temperature every second, showing signed charge/discharge watts, net average, a 60-second live curve and a zoomable full-screen history.",
     "categories": [
-      "System Tools",
-      "Hardware & IoT"
+      "System Tools"
     ],
     "screenshots": [
       "preview/device-compact-home.png",
