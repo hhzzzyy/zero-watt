@@ -11,7 +11,7 @@ set(APP_PACKAGE_BASENAME "ZeroWatt" CACHE STRING "Filename stem used for the Deb
 set(APP_DEBIAN_REVISION "rev1" CACHE STRING "Debian package revision/vendor suffix")
 set(APP_DEBIAN_ARCHITECTURE "arm64" CACHE STRING "Debian package architecture")
 set(APP_MAINTAINER "hzy <573493999@qq.com>" CACHE STRING "Debian package maintainer")
-set(APP_PACKAGE_DESCRIPTION "ASCII battery power monitor for CardputerZero" CACHE STRING "Debian package summary")
+set(APP_PACKAGE_DESCRIPTION "Battery power monitor for Cardputer Zero" CACHE STRING "Debian package summary")
 set(APP_SOURCE_REPO "https://github.com/hhzzzyy/zero-watt" CACHE STRING "Public source repository")
 set(APP_INSTALL_COLLECTOR_SERVICE ON CACHE BOOL "Install the user-level collector service")
 

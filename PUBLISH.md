@@ -30,7 +30,7 @@ no existing store identity to migrate.
 
 ## Source and Ownership
 
-- Public source repository: `https://github.com/hhzzzyy/zero-watt` (created 2026-11-17; the repository is empty until the local `main` is pushed)
+- Public source repository: `https://github.com/hhzzzyy/zero-watt` (created 2026-11-17)
 - GitHub owner: `hhzzzyy`
 - License: MIT
 - Store share code: `ZWAT` (provisional; confirm it is still unique in the store before first upload)
@@ -38,8 +38,8 @@ no existing store identity to migrate.
 ## Listing
 
 - Application name: Zero Watt
-- One-line summary (maximum 80 characters): ASCII battery power monitor with a 60-second history for Cardputer Zero
-- Description: LVGL character interface displaying battery power, current, voltage, capacity, temperature and discharge ETA from the BQ27220 sysfs, with a 60-second live graph and full-screen history.
+- One-line summary (maximum 80 characters): Battery power monitor for Cardputer Zero with a live watt curve and history
+- Description: Reads BQ27220 voltage, current, capacity and temperature every second, showing signed charge/discharge watts, net average, a 60-second live curve and a zoomable full-screen history.
 - Categories (maximum 2 from the store enum): System Tools, Hardware & IoT
 - Permissions: background service only; camera, microphone, IMU, network, additional hardware, and external display are false.
 
@@ -67,7 +67,7 @@ read, using demo data where the UI is marked `[DEMO]`.
       the `power-monitor` development package and the old collector was stopped.
 - [x] `cmake -DPACKAGE_FILE=dist/ZeroWatt_0.1.0_rev1_arm64.deb -P .agents/skills/cardputerzero-package-release/scripts/validate_app_builder.cmake` passes.
 - [x] `app-builder.json` source repo and author point at `https://github.com/hhzzzyy/zero-watt`.
-- [ ] The source repository has been pushed and `share_code` uniqueness is confirmed in the store.
+- [ ] `share_code` uniqueness is confirmed in the store.
 - [ ] Listing copy and categories have been reviewed.
 - [x] Four clean 320 x 170 baseline screenshots describe the current UI.
 - [x] No credentials, tokens, or private server details are embedded.

@@ -3,10 +3,10 @@
   "package_name": "zero-watt",
   "version": "0.1.0",
   "bin_name": "zero-watt",
-  "description": "ASCII battery power monitor for Cardputer Zero",
+  "description": "Battery power monitor for Cardputer Zero",
   "store": {
-    "summary": "ASCII battery power monitor with a 60-second history for Cardputer Zero",
-    "description": "LVGL character interface displaying battery power, current, voltage, capacity, temperature and discharge ETA from the BQ27220 sysfs, with a 60-second live graph and full-screen history.",
+    "summary": "Battery power monitor for Cardputer Zero with a live watt curve and history",
+    "description": "Reads BQ27220 voltage, current, capacity and temperature every second, showing signed charge/discharge watts, net average, a 60-second live curve and a zoomable full-screen history.",
     "categories": [
       "System Tools",
       "Hardware & IoT"
@@ -36,8 +36,8 @@
     },
     "locales": {
       "zh-CN": {
-        "summary": "适用于 Cardputer Zero 的 ASCII 电池功率监视器，带 60 秒历史曲线",
-        "description": "通过 BQ27220 sysfs 显示电池功率、电流、电压、电量、温度和放电剩余时间，带 60 秒实时曲线和全屏历史页。"
+        "summary": "适用于 Cardputer Zero 的电池功率监视器，带实时功率曲线和全屏历史页",
+        "description": "每秒读取 BQ27220 的电压、电流、电量和温度，显示带符号的充放电功率、净平均值、60 秒实时曲线和可缩放的全屏历史页。"
       }
     }
   }
