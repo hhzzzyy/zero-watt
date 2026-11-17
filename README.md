@@ -14,7 +14,7 @@ systemctl --user daemon-reload
 systemctl --user restart APPLaunch.service
 ```
 
-采集器是用户级服务（`zero-watt-collector.service`），由应用按需启动，不设开机自启。`zero-watt --status` 可查看采样状态。
+采集器是用户级服务（`zero-watt-collector.service`）：首次启动时应用把 `/usr/share/zero-watt/zero-watt-collector.service` 复制到 `~/.config/systemd/user/`，再按需启动，不设开机自启。`zero-watt --status` 可查看采样状态。
 
 ## 操作
 

@@ -2,6 +2,13 @@
 
 更新：2026-11-17（Asia/Shanghai）
 
+## 最新更新：修复商店安装路径
+
+- 商店拒绝了 `usr/lib/systemd/user/zero-watt-collector.service`。单元改为模板 `usr/share/zero-watt/zero-watt-collector.service`；应用启动时复制到 `~/.config/systemd/user/`，执行 `systemctl --user daemon-reload` 后再启动。
+- 包内移除 postinst，不再安装任何 `usr/lib/systemd/user` 或系统级 service。
+- 官方 `install_path_policy.py` 对 `dist/ZeroWatt_0.1.0_rev1_arm64.deb` 返回 clean。
+- 设备当时未连接，运行时安装单元这一步尚未真机验证。
+
 ## 最新更新：更名为 Zero Watt
 
 - 显示名 `Zero Watt`，包名与二进制 `zero-watt`；源码目录仍是 `cardputer-power-monitor`，没有改目录名。
@@ -111,7 +118,7 @@ ADB shell 是 root。先前在沙箱内启动的 ADB 服务无法识别 USB，�
 设备：Debian GNU/Linux 13 (trixie)，aarch64，约 352 MiB RAM + swap。使用 `-j1` 编译。
 
 - 程序：`/usr/bin/zero-watt`
-- 用户级采集服务：`/usr/lib/systemd/user/zero-watt-collector.service`
+- 采集器单元模板：`/usr/share/zero-watt/zero-watt-collector.service`；运行时安装到 `~/.config/systemd/user/zero-watt-collector.service`
 - desktop：`/usr/share/APPLaunch/applications/zero-watt.desktop`
 - 图标：`/usr/share/APPLaunch/share/images/zero-watt.png`
 - 文档：`/usr/share/doc/zero-watt/`

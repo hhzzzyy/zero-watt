@@ -16,7 +16,7 @@ Portal: <https://dev.cardputer.cc/#/upload>
 - Maintainer: `hzy <573493999@qq.com>`
 - APPLaunch desktop: `/usr/share/APPLaunch/applications/zero-watt.desktop`
 - Executable: `/usr/bin/zero-watt`
-- User collector unit: `/usr/lib/systemd/user/zero-watt-collector.service`
+- Collector unit template: `/usr/share/zero-watt/zero-watt-collector.service` (copied to `~/.config/systemd/user/` on first launch; the package has no `postinst`)
 - Development upgrade: the package declares `Replaces`/`Conflicts: power-monitor`,
   so `dpkg -i` replaces a previous Power Monitor development install.
 
@@ -62,7 +62,9 @@ read, using demo data where the UI is marked `[DEMO]`.
 - [x] `.deb` exists and can be parsed with `dpkg-deb -I` and `dpkg-deb -c`.
 - [x] Control fields contain Package, Version, Architecture, Maintainer, and Depends.
 - [x] Architecture is `arm64`.
-- [x] APPLaunch `.desktop`, executable, PNG icon, and user collector unit exist inside the package.
+- [x] APPLaunch `.desktop`, executable, PNG icon, and collector unit template exist inside the package.
+- [x] No forbidden install paths (`usr/local`, aliased `bin/`/`lib/` roots, `usr/lib/systemd/user`); everything is under `usr/bin`, `usr/share/zero-watt`, `usr/share/APPLaunch`, or `usr/share/doc`.
+- [x] Official `install_path_policy.py` reports no rejected paths for the built `.deb`.
 - [x] The renamed package was installed on the device with `dpkg -i`; it replaced
       the `power-monitor` development package and the old collector was stopped.
 - [x] `cmake -DPACKAGE_FILE=dist/ZeroWatt_0.1.0_rev1_arm64.deb -P .agents/skills/cardputerzero-package-release/scripts/validate_app_builder.cmake` passes.

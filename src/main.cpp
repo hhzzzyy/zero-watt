@@ -18,9 +18,12 @@
 #include <cmath>
 #include <csignal>
 #include <cstdlib>
+#include <filesystem>
 #include <fstream>
 #include <iostream>
+#include <iterator>
 #include <sstream>
+#include <system_error>
 #include <thread>
 #include <vector>
 #if !USE_DESKTOP
@@ -169,6 +172,44 @@ namespace {
     return std::string(on?"#66dc8a B(ackground)#":"#8cabb8 B(ackground)#")+" #8cabb8 T(ime) G(raph) H(elp) Esc    ";
   }
 #if !USE_DESKTOP
+  std::string executable_path() {
+    std::error_code ec;
+    const auto path=std::filesystem::read_symlink("/proc/self/exe",ec);
+    if(ec) throw std::runtime_error("Cannot resolve executable path: "+ec.message());
+    return path.string();
+  }
+  // The package ships a user-level unit template under usr/share/zero-watt/.
+  // Install it into the user's own unit directory before starting it; a
+  // package-installed usr/lib/systemd/user unit is rejected by the store.
+
+  void install_user_service() {
+    const char *config=std::getenv("XDG_CONFIG_HOME");
+    const char *home=std::getenv("HOME");
+    const std::string base=config&&*config?config:(home&&*home?std::string(home)+"/.config":"");
+    if(base.empty()) throw std::runtime_error("Cannot locate user configuration directory");
+    const auto template_path=std::filesystem::path(executable_path()).parent_path().parent_path()/"share/zero-watt/zero-watt-collector.service";
+    std::ifstream in(template_path);
+    if(!in) throw std::runtime_error("Cannot read collector unit template: "+template_path.string());
+    const std::string unit((std::istreambuf_iterator<char>(in)),std::istreambuf_iterator<char>());
+    if(unit.empty()) throw std::runtime_error("Collector unit template is empty: "+template_path.string());
+    const auto directory=std::filesystem::path(base)/"systemd/user";
+    const auto target=directory/"zero-watt-collector.service";
+    std::ifstream old(target);
+    const std::string previous((std::istreambuf_iterator<char>(old)),std::istreambuf_iterator<char>());
+    if(previous==unit) return;
+    std::error_code ec;
+    std::filesystem::create_directories(directory,ec);
+    if(ec) throw std::runtime_error("Cannot create "+directory.string()+": "+ec.message());
+    const auto temporary=target.string()+".tmp";
+    {
+      std::ofstream out(temporary,std::ios::binary|std::ios::trunc);
+      out<<unit;
+      if(!out) throw std::runtime_error("Cannot write "+temporary);
+    }
+    std::filesystem::rename(temporary,target,ec);
+    if(ec) throw std::runtime_error("Cannot install "+target.string()+": "+ec.message());
+    if(std::system("systemctl --user daemon-reload")!=0) throw std::runtime_error("Cannot reload user systemd units");
+  }
   std::string framebuffer() {
     if(auto *env=std::getenv("LV_LINUX_FBDEV_DEVICE")) if(*env) return env;
     std::ifstream f("/proc/fb"); std::string line;
@@ -209,6 +250,11 @@ int main(int argc,char **argv) {
     std::unique_ptr<power::Collector> collector;
     if(!demo && capture.empty()) {
       collector=std::make_unique<power::Collector>();
+#if !USE_DESKTOP
+      // Keep the installed unit current even when an older collector is
+      // already running (for example right after a package upgrade).
+      install_user_service();
+#endif
       if(!collector->active()) {
 #if USE_DESKTOP
 	pid_t child=fork();

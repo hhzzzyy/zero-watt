@@ -22,16 +22,6 @@ configure_file(
     @ONLY
 )
 
-configure_file(
-    "${CMAKE_CURRENT_LIST_DIR}/templates/postinst"
-    "${APP_GENERATED_DIR}/postinst"
-    COPYONLY
-)
-file(CHMOD "${APP_GENERATED_DIR}/postinst"
-    PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE
-                GROUP_READ GROUP_EXECUTE
-                WORLD_READ WORLD_EXECUTE)
-
 install(TARGETS ${PROJECT_NAME}
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
 )
@@ -45,8 +35,11 @@ install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/applaunch/share/images/zero-watt.png"
 )
 
 if(APP_INSTALL_COLLECTOR_SERVICE)
+    # User-level unit template. The application copies it to
+    # ~/.config/systemd/user/ on first launch; the package itself must not
+    # install into usr/lib/systemd/user/, which the store path policy rejects.
     install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/applaunch/zero-watt-collector.service"
-        DESTINATION "${CMAKE_INSTALL_LIBDIR}/systemd/user"
+        DESTINATION "${CMAKE_INSTALL_DATADIR}/zero-watt"
     )
 endif()
 
@@ -82,6 +75,5 @@ set(CPACK_DEBIAN_PACKAGE_REPLACES "power-monitor")
 set(CPACK_DEBIAN_PACKAGE_CONFLICTS "power-monitor")
 set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS OFF)
 set(CPACK_DEBIAN_PACKAGE_CONTROL_STRICT_PERMISSION TRUE)
-set(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA "${APP_GENERATED_DIR}/postinst")
 
 include(CPack)

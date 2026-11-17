@@ -1,3 +1,6 @@
+# Template for a per-user unit. The application copies this file to
+# ~/.config/systemd/user/zero-watt-collector.service and starts it with
+# `systemctl --user`. It runs as the logged-in user, so User= is not used.
 [Unit]
 Description=Zero Watt battery collector
 

@@ -108,7 +108,7 @@ confirmed before an upload.
   `dist/ZeroWatt_0.1.0_rev1_arm64.deb`. `dpkg-deb` reports Package `zero-watt`,
   Version `0.1.0-rev1`, Architecture `arm64`, and `Replaces`/`Conflicts: power-monitor`.
   The package contains the ARM aarch64 `/usr/bin/zero-watt`, the `Zero Watt` APPLaunch
-  entry, `zero-watt.png`, the user collector unit, and docs under `/usr/share/doc/zero-watt`.
+  entry, `zero-watt.png`, the collector unit template, and docs under `/usr/share/doc/zero-watt`.
   The official validator passes with the package path.
 - Regenerated the desktop captures with the new header: `preview/demo.png`,
   `preview/help.png`, `preview/sample.png`, and `preview/missing.png`. The full-screen
@@ -129,3 +129,23 @@ confirmed before an upload.
   collection.
 - Still unverified: physical key presses, full launcher navigation/selection, Home
   handling, 24-hour soak, actual suspend/resume, and power overhead.
+
+## Store install-path compliance — 2026-11-17
+
+The store rejected `usr/lib/systemd/user/zero-watt-collector.service`. The unit is
+now shipped as a read-only template at
+`usr/share/zero-watt/zero-watt-collector.service`; on first launch (and after an
+upgrade) the app copies it to `~/.config/systemd/user/zero-watt-collector.service`,
+runs `systemctl --user daemon-reload`, and then starts it. The package no longer
+installs a `postinst` or any file under `usr/lib/systemd/user`.
+
+- Official `install_path_policy.py zero-watt dist/ZeroWatt_0.1.0_rev1_arm64.deb`
+  reports no rejected paths.
+- The package contains only `usr/bin/zero-watt`, `usr/share/zero-watt/`,
+  `usr/share/APPLaunch/`, and `usr/share/doc/zero-watt/`; there are no setuid
+  files, no system services, and no `usr/local` or aliased `bin`/`lib` paths.
+- Desktop build and all five CTest checks pass; `cp0-cross-package` builds the
+  arm64 DEB with the new layout.
+- Not yet verified on hardware: the runtime copy of the unit, `daemon-reload`,
+  and the successful `systemctl --user start` after an upgrade. The device was
+  disconnected while this change was built.
