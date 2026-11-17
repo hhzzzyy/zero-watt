@@ -52,9 +52,9 @@ no existing store identity to migrate.
 - Screenshot 3 (320 x 170): `preview/device-history.png`
 - Screenshot 4 (320 x 170): `preview/device-settings.png`
 
-The four store screenshots predate the rename and still show the `POWER MONITOR`
-header. Replace them with fresh device captures (or the current 320 x 170
-captures) before uploading.
+All four store screenshots were recaptured on the device after the rename and
+show the current `ZERO WATT` header. Each is a real 320 x 170 RGB565 framebuffer
+read, using demo data where the UI is marked `[DEMO]`.
 
 ## Preflight
 
@@ -63,11 +63,12 @@ captures) before uploading.
 - [x] Control fields contain Package, Version, Architecture, Maintainer, and Depends.
 - [x] Architecture is `arm64`.
 - [x] APPLaunch `.desktop`, executable, PNG icon, and user collector unit exist inside the package.
+- [x] The renamed package was installed on the device with `dpkg -i`; it replaced
+      the `power-monitor` development package and the old collector was stopped.
 - [x] `cmake -DPACKAGE_FILE=dist/ZeroWatt_0.1.0_rev1_arm64.deb -P .agents/skills/cardputerzero-package-release/scripts/validate_app_builder.cmake` passes.
 - [ ] `app-builder.json` source repo exists publicly, author identity is confirmed, and `share_code` uniqueness is confirmed.
 - [ ] Listing copy and categories have been reviewed.
-- [ ] Four clean 320 x 170 baseline screenshots describe the current UI (current
-      device captures still show the old `POWER MONITOR` header).
+- [x] Four clean 320 x 170 baseline screenshots describe the current UI.
 - [x] No credentials, tokens, or private server details are embedded.
 - [ ] The user explicitly approved external submission.
 

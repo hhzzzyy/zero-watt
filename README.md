@@ -176,7 +176,7 @@ ZERO_WATT_INPUT_DEVICE=/dev/input/by-path/platform-3f804000.i2c-event \
 
 macOS 桌面 preset 构建和五项 CTest 已通过；官方 `cp0-cross-package` workflow 在 macOS 上完成 BSP 交叉构建并生成 `dist/ZeroWatt_0.1.0_rev1_arm64.deb`，`dpkg-deb` 和 `app-builder` validator 均通过。详见 `VALIDATION.md`。
 
-已在 Debian 13 / AArch64 真机用 `dpkg -i` 安装官方包：`/usr/bin/zero-watt` 的离屏渲染成功，用户级采集服务可从 `/usr/bin/zero-watt --collect` 启动，`--status` 正常；停 launcher 后交叉产物在真实 fbdev/evdev 上运行 5 秒无错误。启动器已恢复。仍待验证实体按键、从启动器选中应用的完整流程、长按 Home、24 小时 soak 和程序自身功耗。商店上传尚未执行；`app-builder.json` 的 source repo、author 和 share code 仍是待确认值。
+改名后的 `zero-watt` 包已在 Debian 13 / AArch64 真机用 `dpkg -i` 安装，并替换掉旧的 `power-monitor` 开发包。`--demo --capture`、用户级采集服务启动和 `--status` 均正常；注入 evdev H/G/T/Esc 验证了帮助、历史、设置和长按退出，并用实际 framebuffer 重拍四张商店截图。启动器已恢复。仍待验证实体按键、从启动器选中应用的完整流程、长按 Home、24 小时 soak 和程序自身功耗。商店上传尚未执行；`app-builder.json` 的 source repo、author 和 share code 仍是待确认值。
 
 ## 上游约定
 

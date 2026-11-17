@@ -114,6 +114,18 @@ confirmed before an upload.
   `preview/help.png`, `preview/sample.png`, and `preview/missing.png`. The full-screen
   history header shows time rather than the application name, so `preview/history.png`
   is unchanged.
-- Not refreshed: `preview/device-*.png` still show the old `POWER MONITOR` header. They
-  need a new device capture session before store upload, and the device still has the
-  previous development package installed.
+- Installed `dist/ZeroWatt_0.1.0_rev1_arm64.deb` on the Debian 13 device with `dpkg -i`;
+  dpkg removed `power-monitor` in favour of `zero-watt`. The new `/usr/bin/zero-watt`,
+  user unit, APPLaunch entry, icon, and docs are present, and the stale
+  `power-monitor` collector service was stopped.
+- With `APPLaunch.service` stopped, ran `/usr/bin/zero-watt --demo` on the real
+  framebuffer. Injected evdev `H`, `G`, `T`, `Esc`, and a 1.2-second Esc hold; help,
+  history, the retention dialog, cancel, and a clean exit all worked. The launcher was
+  restored and is active.
+- Recaptured the four store screenshots from the actual framebuffer (home, help,
+  history, settings); they now show `ZERO WATT 0.1` with demo data marked `[DEMO]`.
+  `--demo --capture` also succeeded on the device. The app was then opened live from
+  the launcher, started `zero-watt-collector.service`, and `--status` reported active
+  collection.
+- Still unverified: physical key presses, full launcher navigation/selection, Home
+  handling, 24-hour soak, actual suspend/resume, and power overhead.

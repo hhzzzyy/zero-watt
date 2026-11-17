@@ -8,7 +8,8 @@
 - 同步改名：`/usr/bin/zero-watt`、`zero-watt-collector.service`、`zero-watt.desktop`、`zero-watt.png`、运行时目录 `$XDG_RUNTIME_DIR/zero-watt`、设置 `~/.config/zero-watt/settings`、环境变量 `ZERO_WATT_INPUT_DEVICE`，共享内存格式版本改为 `0x5a570003`。
 - 商店字段：`app_name=Zero Watt`、`package_name=zero-watt`、`share_code=ZWAT`（仍待商店确认唯一）。
 - 重新构建：桌面五项测试通过；`cp0-cross-package` 生成 `dist/ZeroWatt_0.1.0_rev1_arm64.deb`，validator 通过。DEB 声明 `Replaces`/`Conflicts: power-monitor`，设备上可直接替换旧开发包。
-- 桌面截图 demo/help/sample/missing 已按新标题重渲；`preview/device-*.png` 仍是旧标题，设备重新连接后需要重拍。
+- 桌面截图 demo/help/sample/missing 已按新标题重渲；真机已安装 `zero-watt` 并用实际 framebuffer 重拍四张商店截图（home/help/history/settings），标题均为 `ZERO WATT 0.1`。
+- `dpkg -i` 已用 `zero-watt` 替换旧的 `power-monitor`；旧的用户级采集进程已停止，新采集服务由应用启动。
 
 ## 最新更新：完全对齐官方 Template 构建/发布标准
 
@@ -115,7 +116,7 @@ ADB shell 是 root。先前在沙箱内启动的 ADB 服务无法识别 USB，�
 - 图标：`/usr/share/APPLaunch/share/images/zero-watt.png`
 - 文档：`/usr/share/doc/zero-watt/`
 
-设备上目前仍安装着旧的 `power-monitor` 开发包；新的 DEB 声明 `Replaces`/`Conflicts: power-monitor`，`dpkg -i` 会替换它。旧的手动安装文件（`/usr/share/APPLaunch/bin/power-monitor`、`run-power-monitor` wrapper）不会被官方包删除；启动器已改为指向 `/usr/bin/zero-watt`。设备不再需要本地源码或 `build-device`。
+设备上已安装 `zero-watt` 0.1.0-rev1；`dpkg -i` 通过 `Replaces`/`Conflicts: power-monitor` 移除了旧的 `power-monitor` 开发包，旧的采集服务进程也已停止。旧的手动安装文件（`/usr/share/APPLaunch/bin/power-monitor`、`run-power-monitor` wrapper）不是官方包安装的，仍留在设备上；启动器已指向 `/usr/bin/zero-watt`。设备不再需要本地源码或 `build-device`。
 
 官方包在 Mac 上构建，设备上直接安装：
 
