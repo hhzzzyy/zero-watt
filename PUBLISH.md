@@ -30,7 +30,7 @@ no existing store identity to migrate.
 
 ## Source and Ownership
 
-- Public source repository: `https://github.com/hhzzzyy/zero-watt` (created 2026-11-17)
+- Public source repository: `https://github.com/hhzzzyy/zero-watt` (created and pushed 2026-11-17)
 - GitHub owner: `hhzzzyy`
 - License: MIT
 - Store share code: `ZWAT` (provisional; confirm it is still unique in the store before first upload)
@@ -67,6 +67,7 @@ read, using demo data where the UI is marked `[DEMO]`.
       the `power-monitor` development package and the old collector was stopped.
 - [x] `cmake -DPACKAGE_FILE=dist/ZeroWatt_0.1.0_rev1_arm64.deb -P .agents/skills/cardputerzero-package-release/scripts/validate_app_builder.cmake` passes.
 - [x] `app-builder.json` source repo and author point at `https://github.com/hhzzzyy/zero-watt`.
+- [x] The public repository contains the pushed `main` history.
 - [ ] `share_code` uniqueness is confirmed in the store.
 - [ ] Listing copy and categories have been reviewed.
 - [x] Four clean 320 x 170 baseline screenshots describe the current UI.
