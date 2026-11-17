@@ -2,5 +2,43 @@
   "app_name": "Power Monitor",
   "package_name": "power-monitor",
   "version": "0.1.0",
-  "description": "LVGL ASCII battery power monitor with a 60-second history for Cardputer Zero"
+  "bin_name": "power-monitor",
+  "description": "ASCII battery power monitor for Cardputer Zero",
+  "store": {
+    "summary": "ASCII battery power monitor with a 60-second history for Cardputer Zero",
+    "description": "LVGL character interface displaying battery power, current, voltage, capacity, temperature and discharge ETA from the BQ27220 sysfs, with a 60-second live graph and full-screen history.",
+    "categories": [
+      "System Tools",
+      "Hardware & IoT"
+    ],
+    "screenshots": [
+      "preview/device-compact-home.png",
+      "preview/device-h-help.png",
+      "preview/device-history.png",
+      "preview/device-settings.png"
+    ],
+    "icon": "applaunch/share/images/power-monitor.png",
+    "license": "MIT",
+    "source_repo": "https://github.com/hzy/cardputer-power-monitor",
+    "author": {
+      "github": "hzy",
+      "display_name": "hzy"
+    },
+    "share_code": "PWRM",
+    "permissions": {
+      "camera": false,
+      "microphone": false,
+      "imu": false,
+      "network": false,
+      "additional_hardware": false,
+      "background_service": true,
+      "external_display": false
+    },
+    "locales": {
+      "zh-CN": {
+        "summary": "适用于 Cardputer Zero 的 ASCII 电池功率监视器，带 60 秒历史曲线",
+        "description": "通过 BQ27220 sysfs 显示电池功率、电流、电压、电量、温度和放电剩余时间，带 60 秒实时曲线和全屏历史页。"
+      }
+    }
+  }
 }

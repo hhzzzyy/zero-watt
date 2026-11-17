@@ -1,0 +1,17 @@
+#!/bin/sh
+set -e
+
+# The collector is a per-user systemd unit. Reload every active user manager so
+# a newly installed or upgraded unit is discovered before the app starts it.
+if command -v systemctl >/dev/null 2>&1; then
+    for runtime in /run/user/[0-9]*; do
+        [ -S "$runtime/bus" ] || continue
+        uid=${runtime##*/}
+        user=$(getent passwd "$uid" 2>/dev/null | cut -d: -f1) || true
+        [ -n "$user" ] || continue
+        runuser -u "$user" -- env XDG_RUNTIME_DIR="$runtime" \
+            systemctl --user daemon-reload >/dev/null 2>&1 || true
+    done
+fi
+
+exit 0

@@ -16,10 +16,10 @@ int main() {
     put("voltage_now","3722000"); put("current_now","-384000"); put("capacity","56");
     put("temp","397"); put("time_to_empty_now","6540"); put("status","Discharging");
     auto s=source.read();
-    check(s.watts && std::abs(*s.watts-1.429248)<1e-9,"Unit conversion/power");
+    check(s.watts && std::abs(*s.watts+1.429248)<1e-9,"Unit conversion/power");
     check(s.temperature==39.7 && s.capacity==56 && s.eta_seconds==6540,"Other units");
     put("status","Charging"); put("current_now","384000");
-    check(!source.read().eta_seconds && source.read().watts==s.watts,"Charge direction and ETA");
+    check(!source.read().eta_seconds && source.read().watts==-*s.watts,"Charge direction and ETA");
     put("current_now","0"); check(source.read().watts==0.0,"True zero supported");
     put("current_now","12bad"); check(!source.read().watts,"Trailing garbage rejected");
     put("current_now","999999999999999999999999999999"); check(!source.read().amps,"Overflow rejected");
@@ -33,6 +33,11 @@ int main() {
     h.add(77,3.0); check(h.window(77)[59]==3.0,"Same-second replace");
     h.add(78,{}); check(!h.window(78)[59],"Missing stays missing");
     check(!h.window(200)[59],"Stale values expire");
+    h.add(201,-2.0);check(h.window(201).back()==-2.0,"Negative history retained");
+    auto range=graph_range(h.window(201));check(range.bottom==-2.0 && range.top==0,"Discharge-only axis");
+    h.add(202,1.2);range=graph_range(h.window(202));check(range.bottom==-2.0 && range.top==1.5,"Mixed signed axis");
+    range=graph_range(0,1.2);check(range.bottom==0 && range.top==1.5,"Charge-only axis");
+    range=graph_range(0,0);check(range.bottom==0 && range.top>0,"Nondegenerate zero axis");
     EscapeHold esc; esc.update(true,100); check(!esc.should_exit(1099) && esc.should_exit(1100),"Long hold without repeat");
     esc.update(false,1101); check(!esc.should_exit(2000),"Release cancels hold");
     esc.update(true,UINT32_MAX-500); check(esc.should_exit(500),"Tick rollover");
@@ -40,5 +45,12 @@ int main() {
         auto f=render(s,h,78,demo,help);
         for(const auto &line:f) {check(line.size()==40,"Fixed width"); for(unsigned char c:line) check(c>=32 && c<=126,"ASCII only");}
     }
+    auto home=render(s,h,78,false,false);
+    check(home[2].find("BAT POWER")!=std::string::npos && home[3].find("BAT [")!=std::string::npos,"Battery rows adjacent");
+    check(home[3].find("DISCHARGING")!=std::string::npos,"Battery state word");
+    check(home[4].find("TEMP")!=std::string::npos && home[5].find_first_not_of(' ')==std::string::npos,"Blank line before graph header");
+    check(home[7].compare(1,1,"+")==0 && home[7].compare(38,1,"+")==0,"Graph frame top border");
+    check(home[15].compare(1,4,"-60s")==0 && home[15].compare(36,3,"now")==0,"Graph time labels align with frame");
+    check(home[6].find("[W]")!=std::string::npos && home[6].find("avg")!=std::string::npos,"Graph stats on top");
     std::cout<<"All core tests passed\n";
 }

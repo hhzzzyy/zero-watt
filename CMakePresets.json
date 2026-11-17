@@ -1,0 +1,153 @@
+{
+    "version": 6,
+    "cmakeMinimumRequired": {
+        "major": 3,
+        "minor": 31,
+        "patch": 0
+    },
+    "configurePresets": [
+        {
+            "name": "cp0-native",
+            "displayName": "CardputerZero Native Build",
+            "description": "Configure a native CardputerZero build with Ninja Multi-Config",
+            "generator": "Ninja Multi-Config",
+            "binaryDir": "${sourceDir}/build/${presetName}",
+            "cacheVariables": {
+                "CMAKE_C_COMPILER": "/usr/bin/gcc",
+                "CMAKE_CXX_COMPILER": "/usr/bin/g++",
+                "CMAKE_CONFIGURATION_TYPES": "Debug;Release",
+                "CMAKE_INSTALL_PREFIX": "${sourceDir}/build/${presetName}/install",
+                "FETCHCONTENT_BASE_DIR": "${sourceDir}/.cache/cp0-deps",
+                "USE_DESKTOP": "OFF"
+            }
+        },
+        {
+            "name": "cp0-cross",
+            "displayName": "CardputerZero Cross Build",
+            "description": "Configure the aarch64 BSP cross build with Ninja Multi-Config",
+            "generator": "Ninja Multi-Config",
+            "binaryDir": "${sourceDir}/build/cp0-cross",
+            "inherits": [
+                "cp0-native"
+            ],
+            "cacheVariables": {
+                "CMAKE_TOOLCHAIN_FILE": "${sourceDir}/cmake/toolchains/cp0-aarch64-linux-gnu.cmake",
+                "CM0_SDK_ROOT": "${sourceDir}/.cache/sdk_bsp-src",
+                "CMAKE_SYSROOT": "${sourceDir}/.cache/sdk_bsp-src",
+                "CM0_ALLOW_FETCH_DEPS": "ON",
+                "USE_DESKTOP": "OFF",
+                "BUILD_TESTING": "OFF"
+            }
+        },
+        {
+            "name": "darwin-arm64",
+            "displayName": "Apple Silicon Desktop Builds",
+            "description": "Configure Apple Silicon desktop builds with Ninja Multi-Config",
+            "generator": "Ninja Multi-Config",
+            "binaryDir": "${sourceDir}/build/${presetName}",
+            "cacheVariables": {
+                "CMAKE_OSX_ARCHITECTURES": "arm64",
+                "CMAKE_CONFIGURATION_TYPES": "Debug;Release",
+                "CMAKE_C_COMPILER": "/usr/bin/clang",
+                "CMAKE_CXX_COMPILER": "/usr/bin/clang++",
+                "CMAKE_INSTALL_PREFIX": "${sourceDir}/build/${presetName}/install",
+                "FETCHCONTENT_BASE_DIR": "${sourceDir}/.cache/darwin-arm64-deps",
+                "USE_DESKTOP": "ON"
+            }
+        },
+        {
+            "name": "linux-x86-64",
+            "displayName": "Linux Desktop Builds",
+            "description": "Configure x86_64 Linux desktop builds with Ninja Multi-Config",
+            "generator": "Ninja Multi-Config",
+            "binaryDir": "${sourceDir}/build/${presetName}",
+            "cacheVariables": {
+                "CMAKE_C_COMPILER": "/usr/bin/gcc",
+                "CMAKE_CXX_COMPILER": "/usr/bin/g++",
+                "CMAKE_CONFIGURATION_TYPES": "Debug;Release",
+                "CMAKE_INSTALL_PREFIX": "${sourceDir}/build/${presetName}/install",
+                "FETCHCONTENT_BASE_DIR": "${sourceDir}/.cache/linux-x86-64-deps",
+                "USE_DESKTOP": "ON"
+            }
+        }
+    ],
+    "buildPresets": [
+        {
+            "name": "cp0-native-dbg",
+            "configurePreset": "cp0-native",
+            "configuration": "Debug"
+        },
+        {
+            "name": "cp0-native-rel",
+            "configurePreset": "cp0-native",
+            "configuration": "Release"
+        },
+        {
+            "name": "cp0-cross-dbg",
+            "configurePreset": "cp0-cross",
+            "configuration": "Debug"
+        },
+        {
+            "name": "cp0-cross-rel",
+            "configurePreset": "cp0-cross",
+            "configuration": "Release"
+        },
+        {
+            "name": "darwin-arm64-dbg",
+            "configurePreset": "darwin-arm64",
+            "configuration": "Debug"
+        },
+        {
+            "name": "darwin-arm64-rel",
+            "configurePreset": "darwin-arm64",
+            "configuration": "Release"
+        },
+        {
+            "name": "linux-x86-64-dbg",
+            "configurePreset": "linux-x86-64",
+            "configuration": "Debug"
+        },
+        {
+            "name": "linux-x86-64-rel",
+            "configurePreset": "linux-x86-64",
+            "configuration": "Release"
+        }
+    ],
+    "packagePresets": [
+        {
+            "name": "cp0-cross-deb",
+            "displayName": "CardputerZero Debian Package",
+            "description": "Package the CardputerZero release build as a Debian package in dist/",
+            "configurePreset": "cp0-cross",
+            "generators": [
+                "DEB"
+            ],
+            "configurations": [
+                "Release"
+            ],
+            "configFile": "${sourceDir}/build/cp0-cross/CPackConfig.cmake",
+            "packageDirectory": "${sourceDir}/dist"
+        }
+    ],
+    "workflowPresets": [
+        {
+            "name": "cp0-cross-package",
+            "displayName": "Configure, Build, and Package CardputerZero",
+            "description": "Configure cp0-cross, build Release, then produce the Debian package",
+            "steps": [
+                {
+                    "type": "configure",
+                    "name": "cp0-cross"
+                },
+                {
+                    "type": "build",
+                    "name": "cp0-cross-rel"
+                },
+                {
+                    "type": "package",
+                    "name": "cp0-cross-deb"
+                }
+            ]
+        }
+    ]
+}

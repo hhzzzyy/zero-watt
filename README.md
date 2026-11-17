@@ -1,6 +1,6 @@
 # Power Monitor v0.1.0
 
-Cardputer Zero 电池功率监视器。LVGL 9.5 在 320×170 屏幕上绘制 **40 列 × 18 行纯 ASCII**，使用内置 UNSCII 8 等宽字体，每行 9 像素。界面只有字符行，没有按钮、进度条或图表控件。APPLaunch 的 `Terminal=false`：这是字符风格的图形程序。
+Cardputer Zero 电池功率监视器。LVGL 9.5 在 320×170 屏幕上绘制 **40 列 × 18 行等宽字符界面**，使用内置 UNSCII 8 等宽字体，每行 9 像素。功率历史使用绿色连续折线，其余界面保留字符风格，没有传统按钮。APPLaunch 的 `Terminal=false`：这是字符风格的图形程序。
 
 ![LVGL demo capture](preview/demo.png)
 
@@ -19,34 +19,68 @@ Cardputer Zero 电池功率监视器。LVGL 9.5 在 320×170 屏幕上绘制 **4
 | `time_to_empty_now` | 秒 → 时分，仅放电时显示 |
 | `status` | 充电、放电等原始状态 |
 
-功率 = `voltage_V * abs(current_A)`，不使用 `power_avg`。这是电池端充/放电功率；接入外部供电时不等同于整机输入功率。sysfs 各文件独立读取，不能保证是硬件同一瞬间的原子快照。
+功率 = `voltage_V * current_A`，保留正负号，不使用 `power_avg`。正值表示充电（绿色），负值表示放电（红色），零线为灰色；主页和历史页均按可见数据自动选择正／负坐标范围。平均值是带符号的净平均功率。这是电池端充/放电功率；接入外部供电时不等同于整机输入功率。sysfs 各文件独立读取，不能保证是硬件同一瞬间的原子快照。
 
-- Enter：帮助页（桌面预览也支持 `H`）。
-- 短按 Esc：返回监视页，在主页保持主页。
-- 按住 Esc 1 秒：退出，不依赖按键重复。
-- SIGINT / SIGTERM：正常退出，供 APPLaunch 长按 Home 使用。
-- 60 秒环形历史以单调时钟计时；30 个曲线格，每格取两秒峰值。平均值使用窗口内有效采样。
-- `--` 表示读失败/无效，`?` 表示曲线格数据缺失或不完整；不会用 0 或旧数据冒充新读数。
+- **B**：切换后台常驻；首次默认关闭，设置自动保存。
+- **T**：设置历史保留时长，输入 1～1440 分钟（默认 30）；直接输入替换原值，Backspace 删除，Enter 保存，Esc 取消。
+- **G**：全屏历史页。横轴实际时间、纵轴带符号 W，白色字符边框内有网格与红绿曲线。左右翻看，上下缩放，Enter 跟随最新，短 Esc/G 返回主页。
+- **H**：主页帮助；短 Esc 从帮助返回，主页短 Esc 不退出。
+- **长按 Esc 1 秒**：常驻开时关闭界面、继续采样；常驻关时关闭界面并停止采集。
+- SIGINT / SIGTERM 和窗口关闭也遵循常驻设置。SIGKILL 无法运行界面清理逻辑。
+- 主屏幕始终显示最近 60 秒。历史时长决定保留多少数据，不是监控结束时间。历史页缩放不会删除数据。
+- 缩短保留时长立即丢弃更旧数据；增加后逐渐积累。历史保存在运行时内存中，重启采集服务／设备后清空，设置保存在 `$XDG_CONFIG_HOME/power-monitor/settings`（默认 `~/.config`）。
+- 缺失样本保留空白；长时间图按像素汇总连续有效样本的最低／最高值，保留峰值，不跨缺口连线。
+
+### 后台采集
+
+设备使用独立的 `power-monitor-collector.service` **systemd 用户服务**，首次打开应用时按需启动，无开机自启。服务只读取电池 sysfs，不打开显示和键盘；前台通过用户运行时目录中的共享内存取得样本。单实例锁避免重复采集，服务异常退出后由 systemd 重启。实际 suspend 时采样暂停。
+
+安装新版本后执行 `systemctl --user daemon-reload`。诊断：
+
+```sh
+systemctl --user status power-monitor-collector.service
+/usr/bin/power-monitor --status
+# 手动停止采集
+systemctl --user stop power-monitor-collector.service
+```
+
+后台监控仍测量电池端功率，不是 USB 总输入功率。桌面预览 `--demo` 不启动服务、不保存设置。
+
+主页底部提示为 单行 `B(ackground) T(ime) G(raph) H(elp) Esc`，其中 `B(ackground)` 在常驻后台开启时为绿色、关闭时为灰色，其余提示统一使用同款灰色（`#8cabb8`）。H 打开／关闭帮助；Esc 仍默认长按退出或后台运行。旧版无符号历史在升级时清空，设置保留。
+
+主页将功率、电流和电压合并为一行，例如 `BAT POWER -1.429W (-0.384A x 3.722V)`。电量行末尾显示状态词：绿色 `CHARGING`、红色 `DISCHARGING`、灰色 `IDLE`（零电流）或 `UNKNOWN`（读取不到电流）。移除独立 CURRENT/VOLTAGE/STATE 行，主页曲线高度由 36 增至 54 像素。曲线使用白色字符外框，量程与平均功率位于框顶，`-60s`／`now` 与框左右边缘对齐。
 
 ## 桌面编译和预览
 
-需要 CMake ≥3.24、C/C++17 编译器、Git、SDL2。首次配置从 GitHub 获取 LVGL v9.5.0。
+需要 CMake ≥3.31、Ninja、C/C++17 编译器、Git、SDL2。首次配置从 GitHub 获取 LVGL v9.5.0。
+
+macOS（Apple Silicon）：
 
 ```sh
-cmake -S . -B build -DUSE_DESKTOP=ON -DCMAKE_BUILD_TYPE=Release
-cmake --build build -j4
-ctest --test-dir build --output-on-failure
-./build/power-monitor --demo
+cmake --preset darwin-arm64
+cmake --build --preset darwin-arm64-rel
+ctest --test-dir build/darwin-arm64 -C Release --output-on-failure
+./build/darwin-arm64/Release/power-monitor --demo
+```
+
+Linux 桌面：
+
+```sh
+cmake --preset linux-x86-64
+cmake --build --preset linux-x86-64-rel
+ctest --test-dir build/linux-x86-64 -C Release --output-on-failure
+./build/linux-x86-64/Release/power-monitor --demo
 ```
 
 如果 SDL2 不在默认搜索路径，增加 `-DCMAKE_PREFIX_PATH=/path/to/SDL2/prefix`。已有 LVGL v9.5.0 源码可增加 `-DFETCHCONTENT_SOURCE_DIR_LVGL=/absolute/path/to/lvgl`，避免再次下载。
 
 ```sh
 # 指定测试目录，目录内放六个同名文本文件
-./build/power-monitor --sysfs-root /path/to/fixture
+./build/darwin-arm64/Release/power-monitor --sysfs-root /path/to/fixture
 # 使用真实 LVGL 软件渲染，无需窗口，导出 320×170 PPM
-./build/power-monitor --demo --capture preview/demo.ppm
-./build/power-monitor --demo --help-screen --capture preview/help.ppm
+./build/darwin-arm64/Release/power-monitor --demo --capture preview/demo.ppm
+./build/darwin-arm64/Release/power-monitor --demo --help-screen --capture preview/help.ppm
+./build/darwin-arm64/Release/power-monitor --demo --history-screen --capture preview/history.ppm
 # 无需 LVGL/SDL，独立测试采样、历史、格式化
 cmake -S . -B build-core -DBUILD_GUI=OFF
 cmake --build build-core
@@ -55,39 +89,70 @@ ctest --test-dir build-core --output-on-failure
 
 ## 真机编译和安装
 
-本项目沿用当前官方 Template 的 CMake + LVGL v9.5.0 路线，缩减了本应用无需的资源、控件和依赖；不是 VibAPP 的预编译模板，不能直接套用该模板的 `make APP_SLUG=...` 命令。
+`cp0-cross` 完全使用官方 Template 的流程：CMake preset + BSP sysroot + CPack DEB。首次 configure 会自动下载约 435 MB 的 BSP（`.cache/sdk_bsp-src`），并需要主机上的 `aarch64-linux-gnu-gcc/g++`。
 
-在 Cardputer Zero 本机，需要 `cmake`、`git`、`g++`（C++17）和 Linux 开发头文件；不需要 SDL2：
+> 官方工具链的下载超时是 300 秒；慢网下 435 MB 的 BSP 可能超时。可以先把 `sdk_bsp.tar.gz` 解压到 `.cache/sdk_bsp-src`，或调大 `cmake/toolchains/cp0-aarch64-linux-gnu.cmake` 中的 `TIMEOUT`。
 
-```sh
-cmake -S . -B build-device -DUSE_DESKTOP=OFF -DBUILD_TESTING=OFF -DCMAKE_BUILD_TYPE=Release
-cmake --build build-device -j1
-sudo cmake --install build-device --prefix /usr
-sudo systemctl restart APPLaunch.service
-```
-
-安装包含程序、wrapper、`.desktop` 和 PNG 图标，全部落在 `/usr/share/APPLaunch`。重启 launcher 会中断当前运行的 launcher 应用，应在安装完成后执行。
-
-Linux 开发机交叉编译（先安装 `aarch64-linux-gnu-gcc/g++`；使用与设备兼容的 sysroot/libc）：
+macOS：
 
 ```sh
-cmake -S . -B build-device -DUSE_DESKTOP=OFF -DBUILD_TESTING=OFF \
-  -DCMAKE_TOOLCHAIN_FILE=cmake/aarch64-linux.cmake -DCMAKE_BUILD_TYPE=Release
-cmake --build build-device -j4
-# 可选：先生成安装目录，检查后拷贝到设备
-DESTDIR="$PWD/dist/stage" cmake --install build-device --prefix /usr
-# 可选：需要 Linux dpkg-deb；拒绝将 macOS/SDL 二进制装成 arm64 包
-MAINTAINER='Your Name <your-email>' ./scripts/package.sh build-device/power-monitor
+brew install aarch64-unknown-linux-gnu ninja dpkg
+cmake --preset cp0-cross
+cmake --build --preset cp0-cross-rel
+cpack --preset cp0-cross-deb
 ```
 
-打包脚本使用官方 skill 的 helper。包内 launcher 直接执行 `bin/power-monitor`；CMake 安装使用 `bin/run-power-monitor` wrapper，两者均无命令参数、均符合 APPLaunch。发布前还需要填写 `PUBLISH.md` 中的维护者、源码链接和商店素材；本版本未提交商店。
+Debian 主机：
+
+```sh
+sudo apt install crossbuild-essential-arm64
+```
+
+也可以一条命令完成 configure、Release 构建和打包：
+
+```sh
+cmake --workflow --preset cp0-cross-package
+```
+
+产物为 `dist/PowerMonitor_0.1.0_rev1_arm64.deb`，布局：
+
+- `/usr/bin/power-monitor`
+- `/usr/share/APPLaunch/applications/power-monitor.desktop`
+- `/usr/share/APPLaunch/share/images/power-monitor.png`
+- `/usr/lib/systemd/user/power-monitor-collector.service`
+- `/usr/share/doc/power-monitor/{README.md,LICENSE}`
+
+官方部署方式是通过 `deploy.sh` 复制到设备，然后在设备上安装：
+
+```sh
+REMOTE_USER=<user> REMOTE_HOST=<device-ip> ./deploy.sh
+sudo apt install --no-install-recommends ./PowerMonitor_0.1.0_rev1_arm64.deb
+```
+
+`deploy.sh` 只复制包，不执行安装。安装后 postinst 会对活动用户执行 `systemctl --user daemon-reload`；随后重启一次启动器刷新条目：
+
+```sh
+runuser -u hzy -- env XDG_RUNTIME_DIR=/run/user/1000 systemctl --user restart APPLaunch.service
+```
+
+如果设备通过 ADB 连接（本机开发便利，非官方 deploy.sh 流程），可以直接：
+
+```sh
+ADB=/tmp/cardputer-adb/platform-tools/adb
+$ADB -s CardputerZero-c7f0bb67 push dist/PowerMonitor_0.1.0_rev1_arm64.deb /data/local/tmp/
+$ADB -s CardputerZero-c7f0bb67 shell dpkg -i /data/local/tmp/PowerMonitor_0.1.0_rev1_arm64.deb
+$ADB -s CardputerZero-c7f0bb67 shell 'runuser -u hzy -- env XDG_RUNTIME_DIR=/run/user/1000 systemctl --user daemon-reload'
+$ADB -s CardputerZero-c7f0bb67 shell 'runuser -u hzy -- env XDG_RUNTIME_DIR=/run/user/1000 systemctl --user restart APPLaunch.service'
+```
+
+旧版本如果曾用 `cmake --install` 安装到 `/usr/share/APPLaunch/bin`，升级后请确认启动器已指向 `/usr/bin/power-monitor`。CPack 的 DEB 生成在 Debian 主机上最可靠；macOS 上需要 Homebrew `dpkg`（它同时提供 `dpkg-deb`），CPack 只有在 PATH 中找到 `dpkg` 时才启用 DEB 生成器。
 
 设备默认扫描 `/proc/fb` 中的 `fb_st7789v` 或 `panel-mipi-dbid`，按条目编号选择设备，不固定使用 `/dev/fb0`。可用环境变量覆盖：
 
 ```sh
 LV_LINUX_FBDEV_DEVICE=/dev/fb1 \
 POWER_MONITOR_INPUT_DEVICE=/dev/input/by-path/platform-3f804000.i2c-event \
-/usr/share/APPLaunch/bin/run-power-monitor
+/usr/bin/power-monitor
 ```
 
 只在确认节点后设置覆盖值；程序会检查分辨率为 320×170。设备输入使用官方约定的 evdev 默认路径，可通过上面的变量更换。
@@ -96,23 +161,25 @@ POWER_MONITOR_INPUT_DEVICE=/dev/input/by-path/platform-3f804000.i2c-event \
 
 - `src/model.*`：独立于 LVGL 的 sysfs provider、快照、按秒历史、Esc 保持状态。
 - `src/ascii_view.*`：快照 → 40×18 ASCII 帧，保持界面纯函数。
-- `src/main.cpp`：LVGL 字符行、显示/输入后端、1 Hz 调度、退出和截图。
+- `src/collector.*`：独立采样服务、运行时环形记录、设置持久化和进程锁。
+- `src/main.cpp`：LVGL 字符行和功率折线绘制、显示/输入后端、1 Hz 调度、退出和截图。
 - `tests/`：临时 sysfs 测试，以及通过真实 SDL 事件验证短按/长按 Esc 和窗口退出。
-- `applaunch/`：launcher 入口、wrapper、应用图标。
-- `scripts/`：图标生成及官方打包 helper。
+- `applaunch/`：APPLaunch 图标和用户级采集服务单元。
+- `cmake/`：官方 BSP 交叉工具链、CPack 包契约和模板。
+- `scripts/`：图标生成辅助脚本。
 
 后续增加独立 `ProcessSource`，读取 `/proc/stat`、`/proc/[pid]/stat` 和 `/proc/[pid]/io`，使用同一单调时间计算差值，并增加进程视图。不要把 `/proc` 文件访问塞进字符渲染器；CPU/IO 活动不能直接转成精确的逐进程瓦数。
 
 ## 已验证与待验证
 
-已在 macOS 编译 LVGL/SDL 版本；核心测试、SDL 生命周期测试和 320×170 LVGL 截图检查详见 `VALIDATION.md`。
+macOS 桌面 preset 构建和五项 CTest 已通过；官方 `cp0-cross-package` workflow 在 macOS 上完成 BSP 交叉构建并生成 `dist/PowerMonitor_0.1.0_rev1_arm64.deb`，`dpkg-deb` 和 `app-builder` validator 均通过。详见 `VALIDATION.md`。
 
-尚未在真机上验证：AArch64 编译、framebuffer 显示、实体键盘映射、launcher 图标和返回、长按 Home、程序自身的功耗开销。当前交付为源码工程及桌面预览，不包含已验证的 arm64 可执行文件或 `.deb`。
+已在 Debian 13 / AArch64 真机用 `dpkg -i` 安装官方包：`/usr/bin/power-monitor` 的离屏渲染成功，用户级采集服务可从 `/usr/bin/power-monitor --collect` 启动，`--status` 正常；停 launcher 后交叉产物在真实 fbdev/evdev 上运行 5 秒无错误。启动器已恢复。仍待验证实体按键、从启动器选中应用的完整流程、长按 Home、24 小时 soak 和程序自身功耗。商店上传尚未执行；`app-builder.json` 的 source repo、author 和 share code 仍是待确认值。
 
 ## 上游约定
 
 - [CardputerZero skill](https://github.com/CardputerZero/skill/blob/main/cardputer-zero-application/SKILL.md)，核对提交 `2a061c0908c40676837d7d40e40b23ac43a2f888`。
-- [CardputerZero Template](https://github.com/CardputerZero/Template)，核对提交 `477fa6d217b683e3084c361a757f03dc8ca9f753`。参考其 CMake/后端组织，未复制传统 widget UI。
+- [CardputerZero Template](https://github.com/CardputerZero/Template)，核对提交 `477fa6d217b683e3084c361a757f03dc8ca9f753`。交叉构建、BSP sysroot、CPack 包契约和 `cp0-cross-package` workflow 均按该模板对齐；未复制其 widget UI。
 - [LVGL v9.5.0](https://github.com/lvgl/lvgl/tree/v9.5.0)，提交 `85aa60d18b3d5e5588d7b247abf90198f07c8a63`，包含等宽字体。
 
-`make_applauncher_package.py` 与 `generate_app_icon.py` 原样来自上述 skill 提交；`PUBLISH.md` 由 skill 模板填写。上游代码和依赖仍遵守各自许可证；发布前确定新增应用代码的许可。
+`generate_app_icon.py` 原样来自上述 skill 提交；发布元数据以 `app-builder.json` 为准，应用代码采用 MIT 许可证。上游代码和依赖仍遵守各自许可证。
