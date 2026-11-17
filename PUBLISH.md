@@ -33,7 +33,7 @@ no existing store identity to migrate.
 - Public source repository: `https://github.com/hhzzzyy/zero-watt` (created and pushed 2026-11-17)
 - GitHub owner: `hhzzzyy`
 - License: MIT
-- Store share code: `ZWAT` (provisional; confirm it is still unique in the store before first upload)
+- Store share code: `ZWAT` (not used by any of the 73 apps in the 2026-11-17 registry; confirm again right before upload)
 
 ## Listing
 
@@ -41,6 +41,7 @@ no existing store identity to migrate.
 - One-line summary (maximum 80 characters): Battery power monitor for Cardputer Zero with a live watt curve and history
 - Description: Reads BQ27220 voltage, current, capacity and temperature every second, showing signed charge/discharge watts, net average, a 60-second live curve and a zoomable full-screen history.
 - Categories (maximum 2 from the store enum): System Tools, Hardware & IoT
+- Category note: the official definition of `Hardware & IoT` covers external sensors, actuators, USB and Grove/EXT modules. Zero Watt only reads the built-in battery, so `System Tools` alone is the safer listing; two categories still pass automated validation.
 - Permissions: background service only; camera, microphone, IMU, network, additional hardware, and external display are false.
 
 ## Assets
@@ -68,15 +69,18 @@ read, using demo data where the UI is marked `[DEMO]`.
 - [x] `cmake -DPACKAGE_FILE=dist/ZeroWatt_0.1.0_rev1_arm64.deb -P .agents/skills/cardputerzero-package-release/scripts/validate_app_builder.cmake` passes.
 - [x] `app-builder.json` source repo and author point at `https://github.com/hhzzzyy/zero-watt`.
 - [x] The public repository contains the pushed `main` history.
-- [ ] `share_code` uniqueness is confirmed in the store.
-- [ ] Listing copy and categories have been reviewed.
+- [x] `share_code` uniqueness: `ZWAT` is absent from the 2026-11-17 store registry (73 apps).
+- [x] The official `store_meta_policy.py` reports no errors and no warnings for the staged metadata.
+- [ ] Listing copy reviewed; category choice still open (see the category note above).
 - [x] Four clean 320 x 170 baseline screenshots describe the current UI.
 - [x] No credentials, tokens, or private server details are embedded.
+- [ ] Demo video recorded on the real device (launch, main features, exit) and attached to the submission PR.
 - [ ] The user explicitly approved external submission.
 
 ## Submission Result
 
 - Status: `not submitted`
+- Demo video: TODO
 - Submitted at: TODO
 - Portal message: TODO
 - Actions URL: TODO
